@@ -1,0 +1,8 @@
+# .venv directory
+.venv/
+
+# cache directories
+__pycache__/
+
+# .env files
+.env

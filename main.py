@@ -1,10 +1,15 @@
 import asyncio
 from messaging.rabbitmq import init_rabbitmq, consume
+from utils.parser import parse_message
+from storage.minio import download_file
 
+raw_file_path = "/tmp/raw"
+processed_file_path = "/tmp/processed"
 
 async def handle_message(message):
     async with message.process():
-        print(f"Received message: {message.body.decode()}")
+        message = await parse_message(message)
+        download_file(message["clientId"], message["objectName"], raw_file_path)
 
 
 async def main():

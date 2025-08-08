@@ -1,0 +1,24 @@
+import os
+from utils.file import is_image, is_video
+from services.image_processor import process_image_async
+from services.video_processor import process_video_async
+
+
+async def process_file_async(filename, raw_file_path="/tmp/raw", processed_file_path="/tmp/processed"):
+    os.makedirs(processed_file_path, exist_ok=True)
+
+    if is_image(filename):
+        await process_image_async(
+            filename,
+            raw_file_path=raw_file_path,
+            processed_file_path=processed_file_path,
+        )
+        print(f"Image {filename} processed successfully.")
+
+    elif is_video(filename):
+        await process_video_async(
+            filename,
+            raw_file_path=raw_file_path,
+            processed_file_path=processed_file_path,
+        )
+        print(f"Video {filename} processed successfully.")

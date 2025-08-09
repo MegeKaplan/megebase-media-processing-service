@@ -35,7 +35,7 @@ def add_id_prefix(media_id, filename):
     return f"{media_id}_{filename}" if media_id else filename
 
 
-def generate_ffmpeg_command(media_id, input_path, output_path, config, resolution):
+def generate_ffmpeg_command(input_path, output_path, config, resolution):
     ffmpeg_cmd = ["ffmpeg", "-i", input_path]
     for key, value in config.items():
         if value is not None:
@@ -45,17 +45,17 @@ def generate_ffmpeg_command(media_id, input_path, output_path, config, resolutio
     ffmpeg_cmd.extend(
         [
             "-hls_segment_filename",
-            os.path.join(output_path, add_id_prefix(media_id, "segment_%03d.ts")),
+            os.path.join(output_path, "segment_%03d.ts"),
         ]
     )
-    ffmpeg_cmd.append(os.path.join(output_path, add_id_prefix(media_id, "index.m3u8")))
+    ffmpeg_cmd.append(os.path.join(output_path, "index.m3u8"))
     return ffmpeg_cmd
 
 
-def generate_thumbnail(media_id, input_path, output_path, config):
+def generate_thumbnail(input_path, output_path, config):
     thumbnail_path = os.path.join(
         output_path,
-        add_id_prefix(media_id, f"thumbnail.{config['format']}"),
+        f"thumbnail.{config['format']}",
     )
 
     # ffmpeg_cmd = [
@@ -88,23 +88,21 @@ def generate_thumbnail(media_id, input_path, output_path, config):
 
 
 def process_video(
-    filename, raw_file_path="/tmp/raw", processed_file_path="/tmp/processed"
+    filename, media_id, raw_file_path="/tmp/raw", processed_file_path="/tmp/processed"
 ):
-    media_id = remove_file_extension(filename)
-
     input_path = os.path.join(raw_file_path, filename)
     output_path = os.path.join(processed_file_path, media_id)
 
     os.makedirs(output_path, exist_ok=True)
 
-    generate_thumbnail(media_id, input_path, output_path, video_config["thumbnail"])
+    generate_thumbnail(input_path, output_path, video_config["thumbnail"])
 
     for res in resolutions:
-        output_path = os.path.join(output_path, f"{media_id}_{res}p")
+        output_path = os.path.join(output_path, f"{res}p")
         os.makedirs(output_path, exist_ok=True)
 
         ffmpeg_cmd = generate_ffmpeg_command(
-            media_id, input_path, output_path, video_config["ffmpeg"], res
+            input_path, output_path, video_config["ffmpeg"], res
         )
         subprocess.run(ffmpeg_cmd, check=True)
 
@@ -114,11 +112,12 @@ def process_video(
 
 
 async def process_video_async(
-    filename, raw_file_path="/tmp/raw", processed_file_path="/tmp/processed"
+    filename, mediaId, raw_file_path="/tmp/raw", processed_file_path="/tmp/processed"
 ):
     return await asyncio.to_thread(
         process_video,
         filename,
+        mediaId,
         raw_file_path,
         processed_file_path,
     )

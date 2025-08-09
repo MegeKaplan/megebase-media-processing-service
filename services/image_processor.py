@@ -11,36 +11,47 @@ image_config = {
 
 
 def process_image(
-    filename, raw_file_path="/tmp/raw", processed_file_path="/tmp/processed"
+    filename,
+    media_id,
+    raw_file_path="/tmp/raw",
+    processed_file_path="/tmp/processed",
+    processing_config=image_config,
 ):
-    mediaId = remove_file_extension(filename)
+    config = processing_config or image_config
+
     output_file_path = os.path.join(
         processed_file_path,
-        mediaId,
-        f"{mediaId}_{image_config['width']}p.{image_config['format']}",
+        media_id,
+        f"{remove_file_extension(filename)}.{config['formats'][0]}",
     )
     os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
     with Image.open(os.path.join(raw_file_path, filename)) as img:
         img = img.convert("RGB")
 
-        aspect_ratio = image_config["width"] / float(img.width)
+        aspect_ratio = config["width"] / float(img.width)
         new_height = int(float(img.height) * aspect_ratio)
-        img = img.resize((image_config["width"], new_height), Image.LANCZOS)
+        img = img.resize((config["width"], new_height), Image.LANCZOS)
 
         img.save(
             output_file_path,
-            image_config["format"],
-            quality=image_config["quality"],
+            config["formats"][0],
+            quality=config["quality"],
         )
     return os.path.dirname(output_file_path), os.path.basename(output_file_path)
 
 
 async def process_image_async(
-    filename, raw_file_path="/tmp/raw", processed_file_path="/tmp/processed"
+    filename,
+    media_id,
+    raw_file_path="/tmp/raw",
+    processed_file_path="/tmp/processed",
+    processing_config=None,
 ):
     return await asyncio.to_thread(
         process_image,
         filename,
+        media_id,
         raw_file_path=raw_file_path,
         processed_file_path=processed_file_path,
+        processing_config=processing_config,
     )

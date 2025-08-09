@@ -14,8 +14,10 @@ async def handle_message(message):
         download_file(message["clientId"], message["objectName"], raw_file_path)
         dirname, basename = await process_file_async(
             message["objectName"],
+            media_id=message["mediaId"],
             raw_file_path=raw_file_path,
             processed_file_path=processed_file_path,
+            processing_config=message["processingConfig"],
         )
         upload_directory(message["clientId"], dirname)
 

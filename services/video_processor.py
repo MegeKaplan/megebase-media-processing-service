@@ -110,11 +110,13 @@ def process_video(
 
         output_path = os.path.join(processed_file_path, media_id)
 
+    return output_path, None
+
 
 async def process_video_async(
     filename, raw_file_path="/tmp/raw", processed_file_path="/tmp/processed"
 ):
-    await asyncio.to_thread(
+    return await asyncio.to_thread(
         process_video,
         filename,
         raw_file_path,

@@ -8,17 +8,15 @@ async def process_file_async(filename, raw_file_path="/tmp/raw", processed_file_
     os.makedirs(processed_file_path, exist_ok=True)
 
     if is_image(filename):
-        await process_image_async(
+        return await process_image_async(
             filename,
             raw_file_path=raw_file_path,
             processed_file_path=processed_file_path,
         )
-        print(f"Image {filename} processed successfully.")
 
     elif is_video(filename):
-        await process_video_async(
+        return await process_video_async(
             filename,
             raw_file_path=raw_file_path,
             processed_file_path=processed_file_path,
         )
-        print(f"Video {filename} processed successfully.")

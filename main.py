@@ -3,6 +3,7 @@ from messaging.rabbitmq import init_rabbitmq, consume
 from utils.parser import parse_message
 from storage.minio import download_file, upload_directory
 from services.processor import process_file_async
+from database.mongo import update_media_by_id
 
 raw_file_path = "/tmp/raw"
 processed_file_path = "/tmp/processed"
@@ -20,6 +21,7 @@ async def handle_message(message):
             processing_config=message["processingConfig"],
         )
         upload_directory(message["clientId"], dirname)
+        update_media_by_id(message["mediaId"], {"status": "processed"})
 
 
 async def main():

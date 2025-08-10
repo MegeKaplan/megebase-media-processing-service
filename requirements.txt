@@ -2,3 +2,4 @@ python-dotenv
 aio-pika
 boto3
 pillow
+pymongo
